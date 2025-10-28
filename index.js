@@ -1,5 +1,3 @@
-// radio y altura en metros
-
 document.getElementById("myButton").onclick = function () {
   const radio = parseFloat(document.getElementById("myRadio").value);
   const altura = parseFloat(document.getElementById("myHeight").value);

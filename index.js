@@ -52,8 +52,6 @@ function calcularVolumen() {
 
 document.getElementById("myLlenadoBttn").onclick = llenadoTanque;
 
-document.getElementById("myLlenadoBttn").onclick = llenadoTanque;
-
 function llenadoTanque() {
   let llenado = parseFloat(document.getElementById("myLlenado").value);
 

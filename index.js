@@ -43,15 +43,23 @@ function calcularVolumen() {
 
 //Llenado y vaciado de agua
 
-// Variable global para mantener el estado actual del tanque
-
 document.getElementById("myLlenadoBttn").onclick = llenadoTanque;
 
 function llenadoTanque() {
   let llenado = parseFloat(document.getElementById("myLlenado").value);
   let volumenLitros = calcularVolumen(); //Llama la función y guarda su resultado
 
+  if (isNaN(llenado) || llenado < 0) {
+    console.log("Datos inválidos en vaciado");
+    return;
+  }
+
   let volumenActual = volumenLitros + llenado;
+
+  if (volumenActual > volumenLitros) {
+    console.log("El tanque se esta rebalsando/Vaciado inminente");
+  }
+
   console.log("Volumen tras llenado: ", volumenActual);
 
   return volumenActual;
@@ -69,6 +77,7 @@ function vaciadoTanque() {
   }
 
   volumenActual = volumenActual - vaciado;
+
   console.log("Volumen tras vaciado: ", volumenActual);
 
   return volumenActual;

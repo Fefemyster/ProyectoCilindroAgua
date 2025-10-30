@@ -1,7 +1,5 @@
 document.getElementById("myButton").onclick = calcularVolumen;
 
-// Validar datos
-
 function calcularVolumen() {
   const radio = parseFloat(document.getElementById("myRadio").value);
   const altura = parseFloat(document.getElementById("myHeight").value);

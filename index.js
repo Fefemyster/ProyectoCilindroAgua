@@ -69,7 +69,7 @@ function vaciadoTanque() {
   }
 
   volumenActual = volumenActual - vaciado;
-  console.log(volumenActual);
+  console.log("Volumen tras vaciado: ", volumenActual);
 
   return volumenActual;
 }

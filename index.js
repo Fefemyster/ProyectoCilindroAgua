@@ -1,9 +1,11 @@
-document.getElementById("myButton").onclick = function () {
+document.getElementById("myButton").onclick = calcularVolumen;
+
+// Validar datos
+
+function calcularVolumen() {
   const radio = parseFloat(document.getElementById("myRadio").value);
   const altura = parseFloat(document.getElementById("myHeight").value);
   const unidad = document.getElementById("unitSelect").value;
-
-  // Validar datos
   if (isNaN(radio) || isNaN(altura) || radio <= 0 || altura <= 0) {
     document.getElementById("myResult").textContent =
       "Por favor ingresa valores válidos.";
@@ -35,4 +37,39 @@ document.getElementById("myButton").onclick = function () {
   document.getElementById(
     "myResult2"
   ).textContent = `Volumen: ${volumenLitros.toFixed(2)} litros`;
-};
+
+  return volumenLitros;
+}
+
+//Llenado y vaciado de agua
+
+// Variable global para mantener el estado actual del tanque
+
+document.getElementById("myLlenadoBttn").onclick = llenadoTanque;
+
+function llenadoTanque() {
+  let llenado = parseFloat(document.getElementById("myLlenado").value);
+  let volumenLitros = calcularVolumen(); //Llama la función y guarda su resultado
+
+  let volumenActual = volumenLitros + llenado;
+  console.log("Volumen tras llenado: ", volumenActual);
+
+  return volumenActual;
+}
+
+document.getElementById("myVaciadoBttn").onclick = vaciadoTanque;
+
+function vaciadoTanque() {
+  let vaciado = parseFloat(document.getElementById("myVaciado").value);
+  let volumenActual = llenadoTanque(); //Llama la función y guarda su resultado
+
+  if (isNaN(vaciado) || vaciado < 0) {
+    console.log("Datos inválidos en vaciado");
+    return;
+  }
+
+  volumenActual = volumenActual - vaciado;
+  console.log(volumenActual);
+
+  return volumenActual;
+}

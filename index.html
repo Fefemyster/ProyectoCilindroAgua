@@ -1,36 +1,98 @@
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VolumenCilindro</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1>Calculadora de volumen</h1>
-    <label>radio</label>
-    <input type="number" id="myRadio" />
-    <label>altura</label>
-    <input type="number" id="myHeight" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Proyecto Cilindro - Panel Control (Dev 3)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="left">
+      <h1>Calculadora de volumen</h1>
 
-    <label for="unitSelect">Unidad:</label>
-    <select id="unitSelect">
-      <option value="m">Metros</option>
-      <option value="cm">Centímetros</option>
-    </select>
+      <div class="form-row">
+        <label for="myRadio">Radio</label>
+        <input type="number" id="myRadio" placeholder="ej. 0.5" step="any" />
+      </div>
 
-    <button id="myButton">Calcular Volumen</button>
+      <div class="form-row">
+        <label for="myHeight">Altura</label>
+        <input type="number" id="myHeight" placeholder="ej. 1.2" step="any" />
+      </div>
 
-    <h2 id="myResult">Result en metros cubicos</h2>
-    <h2 id="myResult2">Result en litros</h2>
+      <div class="form-row">
+        <label for="unitSelect">Unidad</label>
+        <select id="unitSelect">
+          <option value="m">Metros (m)</option>
+          <option value="cm">Centímetros (cm)</option>
+        </select>
+      </div>
 
-    <h1>Llenado tanque</h1>
-    <label>Agregar agua</label>
-    <input type="number" id="myLlenado" />
-    <button id="myLlenadoBttn">Llenar</button>
-    <label>Sacar agua</label>
-    <input type="number" id="myVaciado" />
-    <button id="myVaciadoBttn">Vaciar</button>
+      <button id="myButton" class="btn primary">Calcular Volumen</button>
 
-    <script src="index.js"></script>
-  </body>
+      <div class="results">
+        <h3 id="myResult">Volumen: — m³</h3>
+        <h3 id="myResult2">Capacidad máxima: — litros</h3>
+      </div>
+
+      <hr />
+
+      <h2>Control manual del tanque</h2>
+      <div class="form-row">
+        <label for="myLlenado">Agregar agua (litros)</label>
+        <input type="number" id="myLlenado" step="any" />
+        <button id="myLlenadoBttn" class="btn">Llenar</button>
+      </div>
+
+      <div class="form-row">
+        <label for="myVaciado">Sacar agua (litros)</label>
+        <input type="number" id="myVaciado" step="any" />
+        <button id="myVaciadoBttn" class="btn danger">Vaciar</button>
+      </div>
+    </section>
+
+    <section class="right">
+      <h2>📊 Panel de Control Automático (Dev 3)</h2>
+
+      <div class="panel">
+        <div class="tank-wrapper">
+          <div id="tank" class="tank">
+            <div id="water" class="water"></div>
+          </div>
+
+          <div class="tank-info">
+            <p><strong>Nivel:</strong> <span id="nivelActualDisplay">0</span> L</p>
+            <p><strong>% llenado:</strong> <span id="porcentajeDisplay">0</span>%</p>
+            <p><strong>Capacidad:</strong> <span id="capacidadDisplay">0</span> L</p>
+          </div>
+        </div>
+
+        <div class="controls">
+          <p><strong>Temperatura actual:</strong> <span id="tempDisplay">--</span> °C</p>
+          <p><strong>Temp deseada:</strong>
+            <input type="number" id="tempDeseada" value="40" step="1" /> °C
+          </p>
+
+          <p><strong>Estado válvula:</strong> <span id="valvulaEstado">--</span></p>
+          <p><strong>Estado resistencia:</strong> <span id="resistenciaEstado">--</span></p>
+
+          <div class="buttons">
+            <button id="activarAuto" class="btn primary">✅ Activar Automático</button>
+            <button id="detenerAuto" class="btn">⛔ Detener</button>
+            <button id="resetTank" class="btn">🔄 Resetear tanque</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="alertBox" class="alerts"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>Dev 3: Control automático & Simulación de panel — Entrega funcional</small>
+  </footer>
+
+  <script src="index.js"></script>
+</body>
 </html>

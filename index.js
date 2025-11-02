@@ -1,122 +1,126 @@
-document.getElementById("myButton").onclick = calcularVolumen;
-
-// Validar datos
-
+// Variables globales
 let aguaActual = 0;
 let capacidadMaxima = 0;
+let intervaloAutomatico = null;
 
+document.getElementById("myButton").onclick = calcularVolumen;
+document.getElementById("myLlenadoBttn").onclick = llenadoManual;
+document.getElementById("myVaciadoBttn").onclick = vaciadoManual;
+document.getElementById("activarAuto").onclick = activarAutomatico;
+document.getElementById("detenerAuto").onclick = detenerAutomatico;
+document.getElementById("resetTank").onclick = resetearTanque;
+
+// ---- Calcular Volumen ----
 function calcularVolumen() {
   const radio = parseFloat(document.getElementById("myRadio").value);
   const altura = parseFloat(document.getElementById("myHeight").value);
   const unidad = document.getElementById("unitSelect").value;
+
   if (isNaN(radio) || isNaN(altura) || radio <= 0 || altura <= 0) {
-    document.getElementById("myResult").textContent =
-      "Por favor ingresa valores válidos.";
-    document.getElementById("myResult2").textContent = "";
+    mostrarAlerta("⚠ Ingresa valores válidos en radio y altura.");
     return;
   }
 
-  // Convertir a metros según la unidad seleccionada
-  let radioMetros = radio;
-  let alturaMetros = altura;
+  let r = unidad === "cm" ? radio / 100 : radio;
+  let h = unidad === "cm" ? altura / 100 : altura;
 
-  if (unidad === "cm") {
-    radioMetros = radio / 100;
-    alturaMetros = altura / 100;
-  } else if (unidad === "in") {
-    radioMetros = radio * 0.0254;
-    alturaMetros = altura * 0.0254;
-  }
+  const volumen = Math.PI * r * r * h; // m3
+  capacidadMaxima = volumen * 1000;     // Litros
+  aguaActual = 0;                       // Reiniciar
 
-  //Calculo del volumen y conversion
-  const volumen = Math.PI * Math.pow(radioMetros, 2) * alturaMetros;
-  const volumenLitros = volumen * 1000;
+  document.getElementById("myResult").innerText = `Volumen: ${volumen.toFixed(2)} m³`;
+  document.getElementById("myResult2").innerText = `Capacidad máxima: ${capacidadMaxima.toFixed(2)} litros`;
 
-  
-  // Actualizar capacidad máxima
-  capacidadMaxima = volumenLitros;
-
-  //Mostrando resultados
-  document.getElementById("myResult").textContent = `Volumen: ${volumen.toFixed(
-    2
-  )} m³`;
-
-  document.getElementById(
-    "myResult2"
-  ).textContent = `Capacidad máxima: ${volumenLitros.toFixed(2)} litros`;
-
-  return volumenLitros;
+  document.getElementById("capacidadDisplay").innerText = capacidadMaxima.toFixed(1);
+  actualizarTanque();
+  mostrarAlerta("✔ Volumen calculado correctamente", "ok");
 }
 
-//Llenado y vaciado de agua
-
-document.getElementById("myLlenadoBttn").onclick = llenadoTanque;
-
-function llenadoTanque() {
-  let llenado = parseFloat(document.getElementById("myLlenado").value);
-
-  if (isNaN(llenado) || llenado <= 0) {
-    alert("Por favor ingresa una cantidad válida para llenar.");
+// ---- Llenado Manual ----
+function llenadoManual() {
+  const cantidad = parseFloat(document.getElementById("myLlenado").value);
+  if (isNaN(cantidad) || cantidad <= 0) {
+    mostrarAlerta("⚠ Ingresa litros válidos para llenar.");
     return;
   }
 
-  // Calcular capacidad primero
-  if (capacidadMaxima <= 0) {
-    alert("Primero calcula el volumen del cilindro.");
+  if (aguaActual + cantidad > capacidadMaxima) {
+    aguaActual = capacidadMaxima;
+    mostrarAlerta("✅ Tanque lleno al máximo.");
+  } else {
+    aguaActual += cantidad;
+  }
+  actualizarTanque();
+}
+
+// ---- Vaciado Manual ----
+function vaciadoManual() {
+  const cantidad = parseFloat(document.getElementById("myVaciado").value);
+  if (isNaN(cantidad) || cantidad <= 0) {
+    mostrarAlerta("⚠ Ingresa litros válidos para vaciar.");
     return;
   }
 
-  // Agregar cantidad
-  do {
+  if (aguaActual - cantidad < 0) {
+    aguaActual = 0;
+    mostrarAlerta("⚠ El tanque está vacío.");
+  } else {
+    aguaActual -= cantidad;
+  }
+  actualizarTanque();
+}
+
+// ---- Control Automático ----
+function activarAutomatico() {
+  if (!capacidadMaxima) return mostrarAlerta("⚠ Primero calcula el volumen.");
+
+  if (intervaloAutomatico) {
+    mostrarAlerta("⚠ Ya está activo el sistema automático.");
+    return;
+  }
+
+  mostrarAlerta("✅ Sistema automático activado.", "ok");
+
+  intervaloAutomatico = setInterval(() => {
+    // Simular llenado → si llega al 100%, vacía
     if (aguaActual < capacidadMaxima) {
-      aguaActual++;
-      llenado--;
+      aguaActual += capacidadMaxima * 0.01;
     } else {
-      aguaActual = capacidadMaxima;
-      break; // Limite alcanzado
+      aguaActual = 0;
+      mostrarAlerta("♻ Tanque lleno → vaciando automático");
     }
-  } while (llenado > 0);
-
-  document.getElementById(
-    "myResult2"
-  ).textContent = `Agua actual: ${aguaActual.toFixed(
-    2
-  )} litros / ${capacidadMaxima.toFixed(2)} litros`;
-
-  console.log(`Volumen tras llenado: ${aguaActual} litros`);
+    actualizarTanque();
+  }, 500);
 }
 
-// Vaciado de agua
+function detenerAutomatico() {
+  clearInterval(intervaloAutomatico);
+  intervaloAutomatico = null;
+  mostrarAlerta("⏹ Sistema automático detenido.", "ok");
+}
 
-document.getElementById("myVaciadoBttn").onclick = vaciadoTanque;
+function resetearTanque() {
+  aguaActual = 0;
+  actualizarTanque();
+  mostrarAlerta("🔄 Tanque reiniciado.", "ok");
+}
 
-function vaciadoTanque() {
-  let vaciado = parseFloat(document.getElementById("myVaciado").value);
+// ---- Actualizar visual del tanque ----
+function actualizarTanque() {
+  const porcentaje = capacidadMaxima ? (aguaActual / capacidadMaxima) * 100 : 0;
+  document.getElementById("water").style.height = `${porcentaje}%`;
 
-  if (isNaN(vaciado) || vaciado <= 0) {
-    alert("Por favor ingresa una cantidad válida para vaciar.");
-    return;
-  }
+  document.getElementById("nivelActualDisplay").innerText = aguaActual.toFixed(1);
+  document.getElementById("porcentajeDisplay").innerText = porcentaje.toFixed(1);
+  document.getElementById("capacidadDisplay").innerText = capacidadMaxima.toFixed(1);
+}
 
-  if (capacidadMaxima <= 0) {
-    alert("Primero calcula el volumen del cilindro.");
-    return;
-  }
-
-  // Vaciar cantidad
-  while (vaciado > 0 && aguaActual > 0) {
-    aguaActual--;
-    vaciado--;
-  }
-
-  if (aguaActual < 0) aguaActual = 0;
-
-  // Mostrar resultado
-  document.getElementById(
-    "myResult2"
-  ).textContent = `Agua actual: ${aguaActual.toFixed(
-    2
-  )} litros / ${capacidadMaxima.toFixed(2)} litros`;
-
-  console.log(`Volumen tras vaciado: ${aguaActual} litros`);
+// ---- Alertas ----
+function mostrarAlerta(msg, tipo = "error") {
+  const alertBox = document.getElementById("alertBox");
+  alertBox.innerText = msg;
+  alertBox.style.background = tipo === "ok" ? "#d4edda" : "#f8d7da";
+  alertBox.style.color = tipo === "ok" ? "#155724" : "#721c24";
+  alertBox.style.display = "block";
+  setTimeout(() => alertBox.style.display = "none", 3000);
 }

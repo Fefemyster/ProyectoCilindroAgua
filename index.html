@@ -89,6 +89,65 @@
     </section>
   </main>
 
+  <!-- ======  Control de Temperatura  ====== -->
+<section class="temp-module is-off" id="tempModule">
+  <header class="temp-header">
+    <h3>Control de Temperatura</h3>
+    <!-- Botón ON/OFF  -->
+    <button class="toggle-heater" type="button" aria-pressed="false" id="heaterToggle">
+      🔴 Apagado
+    </button>
+  </header>
+
+  <div class="temp-content">
+    <!-- Termómetro -->
+    <div class="thermo">
+      <div class="thermo-bulb"></div>
+      <div class="thermo-tube">
+        <!-- Nivel de mercurio (altura se actualizará con JS luego) -->
+        <div class="thermo-level" id="thermoLevel" style="height: 0%"></div>
+        <!-- Marcas -->
+        <div class="thermo-scale">
+          <span>60°C</span>
+          <span>50°</span>
+          <span>40°</span>
+          <span>30°</span>
+          <span>20°C</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lecturas y consigna -->
+    <div class="temp-side">
+      <div class="temp-readout">
+        <div class="temp-current">
+          <span class="label">Temperatura actual</span>
+          <span class="value" id="tempCurrent">--</span><span class="unit">°C</span>
+        </div>
+
+    <div class="band-line">
+      Banda (Resistencia): ±<span id="bandDisplay">—</span> °C
+    </div>
+
+        <div class="temp-set">
+          <label for="tempSlider" class="label">Temperatura deseada</label>
+          <div class="set-row">
+            <input type="range" id="tempSlider" min="49" max="60" value="55" step="1" disabled>
+            <span class="set-value"><span id="tempSetValue">55</span>°C</span>
+          </div>
+          <small class="help">Rango permitido: 49–60 °C</small>
+        </div>
+
+        <div class="heater-state">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="heaterStateText">Calentador apagado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ====== Control de Temperatura ====== -->
+
   <footer class="footer">
     <small>Dev 3: Control automático & Simulación de panel — Entrega funcional</small>
   </footer>

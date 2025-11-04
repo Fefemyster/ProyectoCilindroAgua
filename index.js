@@ -2,6 +2,18 @@
 let aguaActual = 0;
 let capacidadMaxima = 0;
 let intervaloAutomatico = null;
+// Funcion global para encender el calentador 
+let powerOn = false;
+let tempSet = 55; // 
+let tempActual = 15; 
+const T_AMBIENTE = 15;   
+const T_MAX      = 65;   
+let BANDA = 1.0;  
+
+const HEAT_PER_TICK = 0.15; 
+const COOL_PER_TICK = 0.05;
+let loopId = null; 
+
 
 document.getElementById("myButton").onclick = calcularVolumen;
 document.getElementById("myLlenadoBttn").onclick = llenadoManual;
@@ -107,6 +119,10 @@ function resetearTanque() {
 
 // ---- Actualizar visual del tanque ----
 function actualizarTanque() {
+
+  BANDA = bandaPorVolumen(aguaActual, capacidadMaxima);
+  actualizarBandDisplay(); 
+
   const porcentaje = capacidadMaxima ? (aguaActual / capacidadMaxima) * 100 : 0;
   document.getElementById("water").style.height = `${porcentaje}%`;
 
@@ -124,3 +140,195 @@ function mostrarAlerta(msg, tipo = "error") {
   alertBox.style.display = "block";
   setTimeout(() => alertBox.style.display = "none", 3000);
 }
+
+function encenderCalentador() {
+  
+  if (aguaActual <= 0) {
+    mostrarAlerta("⚠ No puedes encender el calentador sin agua en el tanque.");
+    return; 
+  }
+
+
+  powerOn = true;
+
+  
+  const module = document.getElementById('tempModule');
+  module.classList.remove('is-off');
+  module.classList.add('is-on');
+
+  
+  const toggle = document.getElementById('heaterToggle');
+  toggle.setAttribute('aria-pressed', 'true');
+  toggle.textContent = '🟢 Encendido';
+
+  
+  const slider = document.getElementById('tempSlider');
+  slider.disabled = false;
+
+  
+  document.getElementById('heaterStateText').textContent = 'Encendido (en espera)';
+}
+
+//funcion para apagar el calentador
+
+function apagarCalentador() {
+  powerOn = false;
+
+  // modulo de apagado
+  const module = document.getElementById('tempModule');
+  module.classList.remove('is-on');
+  module.classList.add('is-off');
+
+  // Boton
+  const toggle = document.getElementById('heaterToggle');
+  toggle.setAttribute('aria-pressed', 'false');
+  toggle.textContent = '🔴 Apagado';
+
+  // Deshabilitar slider
+  const slider = document.getElementById('tempSlider');
+  slider.disabled = true;
+
+  // Estado texto
+  document.getElementById('heaterStateText').textContent = 'Calentador apagado';
+
+  
+}
+
+//Boton de apagado 
+document.getElementById('heaterToggle').addEventListener('click', () => {
+  if (powerOn) apagarCalentador();
+  else encenderCalentador();
+});
+
+
+
+const slider   = document.getElementById('tempSlider');
+const setLabel = document.getElementById('tempSetValue');
+
+slider.value = String(tempSet);
+setLabel.textContent = tempSet;
+
+
+slider.addEventListener('input', () => {
+  tempSet = Number(slider.value);        
+  setLabel.textContent = tempSet;        
+});
+
+
+slider.addEventListener('change', () => {
+  
+});
+
+
+if (slider && setLabel) {
+  slider.value = String(tempSet);
+  setLabel.textContent = tempSet;
+
+  
+  slider.addEventListener('input', () => {
+    tempSet = Number(slider.value);     
+    setLabel.textContent = tempSet;     
+  });
+
+  
+  slider.addEventListener('change', () => {
+    
+  });
+}
+
+
+function actualizarTermometro() {
+  const display = document.getElementById('tempCurrent');
+  const level = document.getElementById('thermoLevel');
+
+  // Mostrar número en pantalla
+  display.textContent = tempActual.toFixed(1);
+
+  
+  const porcentaje = Math.min(100, Math.max(0, (tempActual / 60) * 100));
+  level.style.height = `${porcentaje}%`;
+
+  
+  let color;
+  if (tempActual < 25) color = '#00bfff';       
+  else if (tempActual < 45) color = '#ffa500';  
+  else color = '#ff4c4c';                       
+
+  level.style.background = color;
+
+  
+}
+
+function startTempLoop() {
+  if (loopId) return; 
+
+  loopId = setInterval(() => {
+    
+    let heaterShouldHeat = false;
+    if (powerOn) {
+      const low  = tempSet - BANDA / 2;
+      const high = tempSet + BANDA / 2;
+
+      
+      if (tempActual < low)       heaterShouldHeat = true;
+      else if (tempActual > high) heaterShouldHeat = false;
+      
+      
+    }
+
+    
+    if (heaterShouldHeat) {
+      tempActual += HEAT_PER_TICK;
+    } else {
+       
+      if (tempActual > T_AMBIENTE) tempActual -= COOL_PER_TICK;
+      
+      if (tempActual < T_AMBIENTE) tempActual = T_AMBIENTE;
+    }
+
+    
+    if (tempActual > T_MAX) tempActual = T_MAX;
+
+    
+    actualizarTermometro();
+
+    const stateEl = document.getElementById('heaterStateText');
+    if (stateEl) {
+      if (!powerOn) stateEl.textContent = 'Calentador apagado';
+      else stateEl.textContent = heaterShouldHeat ? 'Calentando…' : 'Encendido (en espera)';
+    }
+  }, 500); 
+}
+
+function bandaPorVolumen(litros, capacidadLitros) {
+  if (!capacidadLitros || capacidadLitros <= 0) return 1.0; 
+
+  const frac = Math.max(0, Math.min(1, litros / capacidadLitros));
+
+  const banda = 1.0 + 2.0 * frac; 
+
+  
+  return Math.min(4.0, Math.max(0.5, banda));
+}
+
+BANDA = bandaPorVolumen(aguaActual, capacidadMaxima)
+
+function actualizarBandDisplay() {
+  const el = document.getElementById('bandDisplay');
+  if (!el) return;
+  el.textContent = (typeof BANDA === 'number') ? BANDA.toFixed(1) : '—';
+}
+
+
+
+
+
+apagarCalentador();    
+actualizarTermometro();
+startTempLoop()
+actualizarBandDisplay();
+
+
+
+
+

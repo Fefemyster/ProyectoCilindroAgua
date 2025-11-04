@@ -163,3 +163,94 @@ h1, h2 {
   color: #888;
 }
 
+/* ====== Módulo de Temperatura ====== */
+.temp-module{
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #e3e6ea;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.temp-header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-bottom: 12px;
+}
+.temp-header h3{ margin:0; font-size:1.05rem; }
+
+.toggle-heater{
+  padding:8px 14px; border-radius:10px; border:1px solid #d1d5db;
+  background:#f3f4f6; cursor:pointer; font-weight:600;
+  transition: all .15s ease;
+}
+.temp-module.is-on .toggle-heater{
+  background:#16a34a; color:#fff; border-color:#128a3e;
+}
+.temp-module.is-on .toggle-heater::before{ content:"🟢 "; }
+.temp-module.is-off .toggle-heater::before{ content:"🔴 "; }
+
+.temp-content{
+  display:grid; grid-template-columns: 120px 1fr; gap:18px; align-items:center;
+}
+
+/* Termómetro */
+.thermo{ display:flex; align-items:flex-end; gap:8px; }
+.thermo-bulb{
+  width:28px; height:28px; border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, #ff5a5a, #d71f1f);
+  box-shadow: inset 0 -2px 6px rgba(0,0,0,.25);
+}
+.thermo-tube{
+  position: relative;
+  width:36px; height:180px; border-radius:18px; overflow:hidden;
+  background: linear-gradient(#f4f6f8, #eceff3);
+  border:2px solid #cfd6dd;
+  box-shadow: inset 0 0 0 2px #ffffff;
+}
+.thermo-level{
+  position:absolute; bottom:0; left:0; right:0;
+  background: linear-gradient(#ffb080, #ff6b6b);
+  height:0%;
+  transition: height .25s ease, background .25s ease;
+}
+.thermo-scale{
+  position:absolute; right:-52px; top:4px; bottom:4px;
+  display:flex; flex-direction:column; justify-content:space-between;
+  font-size:.8rem; color:#6b7280;
+}
+
+/* Lecturas y slider */
+.temp-side{ display:flex; }
+.temp-readout{ width:100%; }
+.temp-current{
+  display:flex; align-items:baseline; gap:8px;
+  margin-bottom:10px;
+}
+.temp-current .label{ color:#6b7280; }
+.temp-current .value{
+  font-size:2rem; font-weight:700; color:#111827; min-width:3ch; text-align:right;
+}
+.temp-current .unit{ color:#4b5563; }
+
+.temp-set .label{ display:block; color:#374151; margin-bottom:4px; }
+.set-row{ display:flex; align-items:center; gap:10px; }
+#tempSlider{ width:100%; }
+.set-value{ min-width:56px; text-align:right; font-weight:600; color:#111827; }
+.help{ color:#6b7280; }
+
+.heater-state{ margin-top:10px; display:flex; align-items:center; gap:8px; color:#374151; }
+.heater-state .dot{
+  width:10px; height:10px; border-radius:50%;
+  background:#d1d5db;
+}
+.temp-module.is-on .heater-state .dot{ background:#22c55e; }
+.temp-module.is-off .heater-state .dot{ background:#ef4444; }
+
+/* Estado visual apagado */
+.temp-module.is-off{
+  opacity: 0.9;
+}
+.temp-module.is-off #tempSlider{
+  filter: grayscale(.5);
+}
+

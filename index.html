@@ -1,98 +1,211 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Proyecto Cilindro - Panel Control (Dev 3)</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <main class="container">
-    <section class="left">
-      <h1>Calculadora de volumen</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Proyecto Cilindro - Panel Control (Dev 3)</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="left">
+        <h1>Calculadora de volumen</h1>
 
-      <div class="form-row">
-        <label for="myRadio">Radio</label>
-        <input type="number" id="myRadio" placeholder="ej. 0.5" step="any" />
-      </div>
+        <!-- Modificar los inputs de radio y altura -->
+        <div class="form-row">
+          <label for="myRadio">Radio</label>
+          <input
+            type="number"
+            id="myRadio"
+            placeholder="ej. 0.5"
+            step="any"
+            onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46"
+            pattern="[0-9]*[.]?[0-9]*"
+          />
+        </div>
 
-      <div class="form-row">
-        <label for="myHeight">Altura</label>
-        <input type="number" id="myHeight" placeholder="ej. 1.2" step="any" />
-      </div>
+        <div class="form-row">
+          <label for="myHeight">Altura</label>
+          <input
+            type="number"
+            id="myHeight"
+            placeholder="ej. 1.2"
+            step="any"
+            onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46"
+            pattern="[0-9]*[.]?[0-9]*"
+          />
+        </div>
 
-      <div class="form-row">
-        <label for="unitSelect">Unidad</label>
-        <select id="unitSelect">
-          <option value="m">Metros (m)</option>
-          <option value="cm">Centímetros (cm)</option>
-        </select>
-      </div>
+        <div class="form-row">
+          <label for="unitSelect">Unidad</label>
+          <select id="unitSelect">
+            <option value="m">Metros (m)</option>
+            <option value="cm">Centímetros (cm)</option>
+          </select>
+        </div>
 
-      <button id="myButton" class="btn primary">Calcular Volumen</button>
+        <button id="myButton" class="btn primary">Calcular Volumen</button>
 
-      <div class="results">
-        <h3 id="myResult">Volumen: — m³</h3>
-        <h3 id="myResult2">Capacidad máxima: — litros</h3>
-      </div>
+        <div class="results">
+          <h3 id="myResult">Volumen: — m³</h3>
+          <h3 id="myResult2">Capacidad máxima: — litros</h3>
+        </div>
 
-      <hr />
+        <hr />
 
-      <h2>Control manual del tanque</h2>
-      <div class="form-row">
-        <label for="myLlenado">Agregar agua (litros)</label>
-        <input type="number" id="myLlenado" step="any" />
-        <button id="myLlenadoBttn" class="btn">Llenar</button>
-      </div>
+        <h2>Control manual del tanque</h2>
+        <div class="form-row">
+          <label for="myLlenado">Agregar agua (litros)</label>
+          <input type="number" id="myLlenado" step="any" />
+          <button id="myLlenadoBttn" class="btn">Llenar</button>
+        </div>
 
-      <div class="form-row">
-        <label for="myVaciado">Sacar agua (litros)</label>
-        <input type="number" id="myVaciado" step="any" />
-        <button id="myVaciadoBttn" class="btn danger">Vaciar</button>
-      </div>
-    </section>
+        <div class="form-row">
+          <label for="myVaciado">Sacar agua (litros)</label>
+          <input type="number" id="myVaciado" step="any" />
+          <button id="myVaciadoBttn" class="btn danger">Vaciar</button>
+        </div>
+      </section>
 
-    <section class="right">
-      <h2>📊 Panel de Control Automático (Dev 3)</h2>
+      <section class="right">
+        <h2>📊 Panel de Control Automático</h2>
 
-      <div class="panel">
-        <div class="tank-wrapper">
-          <div id="tank" class="tank">
-            <div id="water" class="water"></div>
+        <div class="panel">
+          <div class="tank-wrapper">
+            <div id="tank" class="tank">
+              <div id="water" class="water"></div>
+            </div>
+
+            <div class="tank-info">
+              <p>
+                <strong>Nivel:</strong> <span id="nivelActualDisplay">0</span> L
+              </p>
+              <p>
+                <strong>% llenado:</strong>
+                <span id="porcentajeDisplay">0</span>%
+              </p>
+              <p>
+                <strong>Capacidad:</strong>
+                <span id="capacidadDisplay">0</span> L
+              </p>
+            </div>
           </div>
 
-          <div class="tank-info">
-            <p><strong>Nivel:</strong> <span id="nivelActualDisplay">0</span> L</p>
-            <p><strong>% llenado:</strong> <span id="porcentajeDisplay">0</span>%</p>
-            <p><strong>Capacidad:</strong> <span id="capacidadDisplay">0</span> L</p>
+          <div class="controls">
+            <p>
+              <strong>Temperatura actual:</strong>
+              <span id="tempDisplay">--</span> °C
+            </p>
+            <p>
+              <strong>Temp deseada:</strong>
+              <input type="number" id="tempDeseada" value="40" step="1" /> °C
+            </p>
+
+            <p>
+              <strong>Estado válvula:</strong>
+              <span id="valvulaEstado">--</span>
+            </p>
+            <p>
+              <strong>Estado resistencia:</strong>
+              <span id="resistenciaEstado">--</span>
+            </p>
+
+            <div class="buttons">
+              <button id="activarAuto" class="btn primary">
+                ✅ Activar Automático
+              </button>
+              <button id="detenerAuto" class="btn">⛔ Detener</button>
+              <button id="resetTank" class="btn">🔄 Resetear tanque</button>
+            </div>
           </div>
         </div>
 
-        <div class="controls">
-          <p><strong>Temperatura actual:</strong> <span id="tempDisplay">--</span> °C</p>
-          <p><strong>Temp deseada:</strong>
-            <input type="number" id="tempDeseada" value="40" step="1" /> °C
-          </p>
+        <div id="alertBox" class="alerts"></div>
+      </section>
+    </main>
 
-          <p><strong>Estado válvula:</strong> <span id="valvulaEstado">--</span></p>
-          <p><strong>Estado resistencia:</strong> <span id="resistenciaEstado">--</span></p>
+    <!-- ======  Control de Temperatura  ====== -->
+    <section class="temp-module is-off" id="tempModule">
+      <header class="temp-header">
+        <h3>Control de Temperatura</h3>
+        <!-- Botón ON/OFF  -->
+        <button
+          class="toggle-heater"
+          type="button"
+          aria-pressed="false"
+          id="heaterToggle"
+        >
+          🔴 Apagado
+        </button>
+      </header>
 
-          <div class="buttons">
-            <button id="activarAuto" class="btn primary">✅ Activar Automático</button>
-            <button id="detenerAuto" class="btn">⛔ Detener</button>
-            <button id="resetTank" class="btn">🔄 Resetear tanque</button>
+      <div class="temp-content">
+        <!-- Termómetro -->
+        <div class="thermo">
+          <div class="thermo-bulb"></div>
+          <div class="thermo-tube">
+            <!-- Nivel de mercurio (altura se actualizará con JS luego) -->
+            <div class="thermo-level" id="thermoLevel" style="height: 0%"></div>
+            <!-- Marcas -->
+            <div class="thermo-scale">
+              <span>60°C</span>
+              <span>50°</span>
+              <span>40°</span>
+              <span>30°</span>
+              <span>20°C</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lecturas y consigna -->
+        <div class="temp-side">
+          <div class="temp-readout">
+            <div class="temp-current">
+              <span class="label">Temperatura actual</span>
+              <span class="value" id="tempCurrent">--</span
+              ><span class="unit">°C</span>
+            </div>
+
+            <div class="band-line">
+              Banda (Resistencia): ±<span id="bandDisplay">—</span> °C
+            </div>
+
+            <div class="temp-set">
+              <label for="tempSlider" class="label">Temperatura deseada</label>
+              <div class="set-row">
+                <input
+                  type="range"
+                  id="tempSlider"
+                  min="49"
+                  max="60"
+                  value="55"
+                  step="1"
+                  disabled
+                />
+                <span class="set-value"
+                  ><span id="tempSetValue">55</span>°C</span
+                >
+              </div>
+              <small class="help">Rango permitido: 49–60 °C</small>
+            </div>
+
+            <div class="heater-state">
+              <span class="dot" aria-hidden="true"></span>
+              <span id="heaterStateText">Calentador apagado</span>
+            </div>
           </div>
         </div>
       </div>
-
-      <div id="alertBox" class="alerts"></div>
     </section>
-  </main>
+    <!-- ====== Control de Temperatura ====== -->
 
-  <footer class="footer">
-    <small>Dev 3: Control automático & Simulación de panel — Entrega funcional</small>
-  </footer>
+    <footer class="footer">
+      <small
+        >Dev 3: Control automático & Simulación de panel — Entrega
+        funcional</small
+      >
+    </footer>
 
-  <script src="index.js"></script>
-</body>
+    <script src="index.js"></script>
+  </body>
 </html>

@@ -146,6 +146,18 @@ function actualizarTanque() {
     porcentaje.toFixed(1);
   document.getElementById("capacidadDisplay").innerText =
     capacidadMaxima.toFixed(1);
+
+   if (aguaActual <= 0) {
+    tempActual = T_AMBIENTE; 
+    actualizarTermometro();  
+  }
+
+  if (aguaActual <= 0) {
+    tempActual = T_AMBIENTE;
+    if (powerOn) apagarCalentador(); 
+    document.getElementById("heaterStateText").textContent = "Calentador apagado (sin agua)";
+    actualizarTermometro();
+  }
 }
 
 // ---- Alertas ----

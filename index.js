@@ -14,6 +14,45 @@ const HEAT_PER_TICK = 0.15;
 const COOL_PER_TICK = 0.05;
 let loopId = null;
 
+// Cargar bitácora desde localStorage
+let bitacora = JSON.parse(localStorage.getItem('bitacora')) || [];
+
+function actualizarTabla() {
+  const tbody = document.querySelector('#tablaBitacora tbody');
+  tbody.innerHTML = '';
+
+  bitacora.forEach(registro => {
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td>${registro.fecha_hora}</td>
+      <td>${registro.temperatura}</td>
+      <td>${registro.nivel_agua}</td>
+    `;
+    tbody.appendChild(fila);
+  });
+}
+
+function registrarCambio(temp, nivel) {
+  if (temp == null || isNaN(temp)) return;       // Ignora temperaturas nulas o NaN
+  if (nivel == null || isNaN(nivel)) return;     // Ignora niveles inválidos
+
+  const fecha_hora = new Date().toLocaleString();
+  const registro = {
+    fecha_hora,
+    temperatura: Number(temp).toFixed(1),
+    nivel_agua: Number(nivel).toFixed(1)
+  };
+
+  bitacora.push(registro);
+  localStorage.setItem('bitacora', JSON.stringify(bitacora));
+  actualizarTabla();
+}
+
+
+// Inicializar tabla al cargar la página
+actualizarTabla();
+
+
 document.getElementById("myButton").onclick = calcularVolumen;
 document.getElementById("myLlenadoBttn").onclick = llenadoManual;
 document.getElementById("myVaciadoBttn").onclick = vaciadoManual;
@@ -52,7 +91,6 @@ function calcularVolumen() {
   mostrarAlerta("✔ Volumen calculado correctamente", "ok");
 }
 
-// ---- Llenado Manual ----
 function llenadoManual() {
   const cantidad = parseFloat(document.getElementById("myLlenado").value);
   if (isNaN(cantidad) || cantidad <= 0) {
@@ -67,9 +105,11 @@ function llenadoManual() {
     aguaActual += cantidad;
   }
   actualizarTanque();
+
+  // Registrar en bitácora
+  registrarCambio(tempActual, (aguaActual / capacidadMaxima) * 100);
 }
 
-// ---- Vaciado Manual ----
 function vaciadoManual() {
   const cantidad = parseFloat(document.getElementById("myVaciado").value);
   if (isNaN(cantidad) || cantidad <= 0) {
@@ -84,7 +124,11 @@ function vaciadoManual() {
     aguaActual -= cantidad;
   }
   actualizarTanque();
+
+  // Registrar en bitácora
+  registrarCambio(tempActual, (aguaActual / capacidadMaxima) * 100);
 }
+
 
 // ---- Control Automático ----
 function activarAutomatico() {
@@ -191,29 +235,30 @@ function encenderCalentador() {
 
   document.getElementById("heaterStateText").textContent =
     "Encendido (en espera)";
-}
 
-//funcion para apagar el calentador
+  // Registrar en bitácora
+  registrarCambio(tempActual, (aguaActual / capacidadMaxima) * 100);
+}
 
 function apagarCalentador() {
   powerOn = false;
 
-  // modulo de apagado
   const module = document.getElementById("tempModule");
   module.classList.remove("is-on");
   module.classList.add("is-off");
 
-  // Boton
   const toggle = document.getElementById("heaterToggle");
   toggle.setAttribute("aria-pressed", "false");
   toggle.textContent = "🔴 Apagado";
 
-  // Deshabilitar slider
   const slider = document.getElementById("tempSlider");
   slider.disabled = true;
 
-  // Estado texto
   document.getElementById("heaterStateText").textContent = "Calentador apagado";
+  // Registrar en bitácora
+  if (capacidadMaxima > 0 && aguaActual >= 0) {
+    registrarCambio(tempActual, (aguaActual / capacidadMaxima) * 100);
+  }
 }
 
 //Boton de apagado
@@ -265,6 +310,7 @@ function actualizarTermometro() {
   level.style.background = color;
 }
 
+
 function startTempLoop() {
   if (loopId) return;
 
@@ -282,7 +328,6 @@ function startTempLoop() {
       tempActual += HEAT_PER_TICK;
     } else {
       if (tempActual > T_AMBIENTE) tempActual -= COOL_PER_TICK;
-
       if (tempActual < T_AMBIENTE) tempActual = T_AMBIENTE;
     }
 
@@ -297,6 +342,12 @@ function startTempLoop() {
         stateEl.textContent = heaterShouldHeat
           ? "Calentando…"
           : "Encendido (en espera)";
+    }
+
+    // 🔹 Registrar en bitácora
+    if (powerOn && aguaActual > 0 && capacidadMaxima > 0) {
+      const porcentaje = (aguaActual / capacidadMaxima) * 100;
+      registrarCambio(tempActual, porcentaje);
     }
   }, 500);
 }
@@ -324,7 +375,6 @@ actualizarTermometro();
 startTempLoop();
 actualizarBandDisplay();
 
-// Prevenir la entrada de 'e' en los inputs numéricos
 document.getElementById("myRadio").addEventListener("keydown", function (e) {
   if (e.key === "e" || e.key === "E") {
     e.preventDefault();
@@ -334,5 +384,15 @@ document.getElementById("myRadio").addEventListener("keydown", function (e) {
 document.getElementById("myHeight").addEventListener("keydown", function (e) {
   if (e.key === "e" || e.key === "E") {
     e.preventDefault();
+  }
+});
+
+// Botón para borrar bitácora
+document.getElementById('btnBorrarBitacora').addEventListener('click', () => {
+  if (confirm("¿Seguro que quieres borrar todos los registros de la bitácora?")) {
+    localStorage.removeItem('bitacora');
+    bitacora = [];
+    actualizarTabla();
+    alert("✅ Bitácora borrada correctamente.");
   }
 });
